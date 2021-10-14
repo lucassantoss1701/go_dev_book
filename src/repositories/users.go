@@ -67,3 +67,19 @@ func (repository Users) GetByNameOrNick(nameOrNick string) ([]models.User, error
 
 	return users, nil
 }
+
+func (repository Users) Update(userID uint64, user models.User) error {
+
+	statament, err := repository.db.Prepare("UPDATE users set name = ?, nick = ?, email = ? where id = ?")
+	if err != nil {
+		return err
+	}
+	defer statament.Close()
+
+	if _, err = statament.Exec(user.Name, user.Nick, user.Email, userID); err != nil {
+		return err
+	}
+
+	return nil
+
+}
