@@ -18,6 +18,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	requestBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.Err(w, http.StatusUnprocessableEntity, err)
+		return
 	}
 
 	var user models.User
