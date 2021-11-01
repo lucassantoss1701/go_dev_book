@@ -147,3 +147,37 @@ func (repository Users) GetByEmail(email string) (models.User, error) {
 	}
 	return user, nil
 }
+
+func (repository Users) FollowUser(userID uint64, followerID uint64) error {
+
+	statement, err := repository.db.Prepare("INSERT IGNORE INTO followers(user_id, follower_id) VALUES (?, ?)")
+
+	if err != nil {
+		return err
+	}
+
+	defer statement.Close()
+
+	if _, err = statement.Exec(userID, followerID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repository Users) UnfollowUser(userID uint64, followerID uint64) error {
+
+	statement, err := repository.db.Prepare("DELETE FROM followers WHERE user_id = ? AND follower_id = ?")
+
+	if err != nil {
+		return err
+	}
+
+	defer statement.Close()
+
+	if _, err = statement.Exec(userID, followerID); err != nil {
+		return err
+	}
+
+	return nil
+}

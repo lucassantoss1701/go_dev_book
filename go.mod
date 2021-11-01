@@ -3,11 +3,12 @@ module api
 go 1.17
 
 require (
-	github.com/badoux/checkmail v1.2.1 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/badoux/checkmail v1.2.1
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.3.0
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
-	golang.org/x/tools/gopls v0.7.2 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 )
+
+require golang.org/x/tools/gopls v0.7.2 // indirect

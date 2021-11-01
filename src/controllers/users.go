@@ -212,4 +212,5 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	responses.JSON(w, http.StatusNoContent, nil)
 }
