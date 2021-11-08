@@ -6,6 +6,7 @@ import (
 	"api/src/models"
 	"api/src/repositories"
 	"api/src/responses"
+	"api/src/security"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -300,4 +301,66 @@ func GetFollowing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responses.JSON(w, http.StatusOK, followers)
+}
+
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+
+	userIDToken, err := authentication.ExtractUserID(r)
+	if err != nil {
+		responses.Err(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	parameters := mux.Vars(r)
+	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)
+	if err != nil {
+		responses.Err(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if userIDToken != userID {
+		responses.Err(w, http.StatusForbidden, errors.New("Usuário não é o seu!"))
+		return
+	}
+
+	requestBody, err := ioutil.ReadAll(r.Body)
+
+	var password models.Password
+
+	if err = json.Unmarshal(requestBody, &password); err != nil {
+		responses.Err(w, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err := database.ToConnect()
+	if err != nil {
+		responses.Err(w, http.StatusInternalServerError, err)
+	}
+
+	defer db.Close()
+
+	repository := repositories.NewUserRepository(db)
+	passwordInDB, err := repository.GetPasswordByUserID(userID)
+	if err != nil {
+		responses.Err(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err = security.VerifyPassoword(passwordInDB, password.CurrentPassword); err != nil {
+		responses.Err(w, http.StatusUnauthorized, errors.New("A senha atual não condiz com a que está salva no banco"))
+		return
+	}
+
+	passwordWithHash, err := security.Hash(password.NewPassoword)
+	if err != nil {
+		responses.Err(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err = repository.UpdatePassword(userID, string(passwordWithHash)); err != nil {
+		responses.Err(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	responses.JSON(w, http.StatusNoContent, nil)
 }

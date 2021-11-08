@@ -14,7 +14,7 @@ type User struct {
 	Name       string    `json:"name,omitempty"`
 	Nick       string    `json:"nick,omitempty"`
 	Email      string    `json:"email,omitempty"`
-	Passoword  string    `json:"password,omitempty"`
+	Password   string    `json:"password,omitempty"`
 	Created_at time.Time `json:"Created_at,omitempty"`
 }
 
@@ -43,7 +43,7 @@ func (user *User) validate(step string) error {
 		return errors.New("O formato de email é inválido")
 	}
 
-	if step == "registration" && user.Passoword == "" {
+	if step == "registration" && user.Password == "" {
 		return errors.New("A senha é obrigátorio e não pode estar em branco")
 	}
 	return nil
@@ -55,12 +55,12 @@ func (user *User) format(step string) error {
 	user.Email = strings.TrimSpace(user.Name)
 
 	if step == "registration" {
-		passwordWithHash, err := security.Hash(user.Passoword)
+		passwordWithHash, err := security.Hash(user.Password)
 		if err != nil {
 			return err
 		}
 
-		user.Passoword = string(passwordWithHash)
+		user.Password = string(passwordWithHash)
 	}
 	return nil
 }

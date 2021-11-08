@@ -24,7 +24,7 @@ func (repository Users) Create(user models.User) (uint64, error) {
 
 	defer statment.Close()
 
-	result, err := statment.Exec(user.Name, user.Nick, user.Email, user.Passoword)
+	result, err := statment.Exec(user.Name, user.Nick, user.Email, user.Password)
 	if err != nil {
 		return 0, err
 	}
@@ -140,7 +140,7 @@ func (repository Users) GetByEmail(email string) (models.User, error) {
 	if rows.Next() {
 		if err = rows.Scan(
 			&user.ID,
-			&user.Passoword,
+			&user.Password,
 		); err != nil {
 			return models.User{}, err
 		}
@@ -243,5 +243,37 @@ func (repository Users) GetFollowing(userID uint64) ([]models.User, error) {
 	}
 
 	return users, nil
+}
 
+func (repository Users) GetPasswordByUserID(userID uint64) (string, error) {
+	rows, err := repository.db.Query("SELECT password from users where id = ?")
+	if err != nil {
+		return "", err
+	}
+
+	defer rows.Close()
+
+	var user models.User
+
+	if rows.Next() {
+		if err = rows.Scan(&user.Password); err != nil {
+			return "", err
+		}
+	}
+
+	return user.Password, nil
+
+}
+
+func (repository Users) UpdatePassword(userID uint64, passoword string) error {
+	statement, err := repository.db.Prepare("UPDATE users set password = ? where id = ? ")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(passoword, userID); err != nil {
+		return err
+	}
+	return nil
 }

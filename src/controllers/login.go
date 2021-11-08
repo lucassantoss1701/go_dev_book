@@ -42,7 +42,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = security.VerifyPassoword(userSavedDatabase.Passoword, user.Passoword); err != nil {
+	if err = security.VerifyPassoword(userSavedDatabase.Password, user.Password); err != nil {
 		responses.Err(w, http.StatusUnauthorized, err)
 		return
 	}
