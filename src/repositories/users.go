@@ -246,7 +246,7 @@ func (repository Users) GetFollowing(userID uint64) ([]models.User, error) {
 }
 
 func (repository Users) GetPasswordByUserID(userID uint64) (string, error) {
-	rows, err := repository.db.Query("SELECT password from users where id = ?")
+	rows, err := repository.db.Query("SELECT password from users where id = ?", userID )
 	if err != nil {
 		return "", err
 	}

@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS devBook;
 USE devbook;
 
+DROP TABLE IF EXISTS publishes;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS followers;
 
@@ -25,4 +26,18 @@ CREATE TABLE followers(
     ON DELETE CASCADE,
 
     PRIMARY KEY(user_id, follower_id)
+)ENGINE=INNODB;
+
+CREATE TABLE publishes(
+    id int auto_increment primary key,
+    title varchar(255) not null,
+    content varchar(255) not null
+
+    author_id int not null
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+
+    likes int default 0,
+    created_at timestamp default current_timestamp()
 )ENGINE=INNODB;
